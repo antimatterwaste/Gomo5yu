@@ -8,15 +8,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     click_label.cpp \
-    main.cpp \
-    gomoku.cpp
+    gomo5yu.cpp \
+    main.cpp
 
 HEADERS += \
     click_label.h \
-    gomoku.h
+    gomo5yu.h
 
 FORMS += \
     gomoku.ui
-
-RESOURCES += \
-    res.qrc

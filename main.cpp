@@ -1,10 +1,10 @@
-#include "gomoku.h"
+#include "gomo5yu.h"
 
 #include <QApplication>
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
-  Gomoku w;
+  Gomo5yu w;
   w.show();
   return a.exec();
 }

@@ -52,12 +52,12 @@ enum SoundType {
   RETRACT,
 };
 
-class Gomoku : public QWidget {
+class Gomo5yu : public QWidget {
   Q_OBJECT
 
  public:
-  Gomoku(QWidget *parent = nullptr);
-  ~Gomoku();
+  Gomo5yu(QWidget *parent = nullptr);
+  ~Gomo5yu();
 
  protected:
   void wheelEvent(QWheelEvent *event);

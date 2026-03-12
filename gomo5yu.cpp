@@ -1,4 +1,4 @@
-#include "gomoku.h"
+#include "gomo5yu.h"
 #include <QApplication>
 #include <QCursor>
 #include <QDebug>
@@ -23,7 +23,7 @@ static thread_local std::mt19937_64 rng_engine([]() {
   return std::mt19937_64(seed);
 }());
 
-Gomoku::Gomoku(QWidget *parent) : QWidget(parent), ui(new Ui::Form) {
+Gomo5yu::Gomo5yu(QWidget *parent) : QWidget(parent), ui(new Ui::Form) {
   ui->setupUi(this);
   ui->toolButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
   ui->toolButton->setPopupMode(QToolButton::InstantPopup);
@@ -90,7 +90,7 @@ Gomoku::Gomoku(QWidget *parent) : QWidget(parent), ui(new Ui::Form) {
   media_player_ = new QMediaPlayer(this);
   connect(media_player_,
           QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this,
-          &Gomoku::handle_playback_error);
+          &Gomo5yu::handle_playback_error);
   init_emoticon_list();
   setWindowFlags(Qt::FramelessWindowHint);
   setAttribute(Qt::WA_TranslucentBackground);
@@ -102,15 +102,15 @@ Gomoku::Gomoku(QWidget *parent) : QWidget(parent), ui(new Ui::Form) {
   move((desk_size.width() - width()) / 2, (desk_size.height() - height()) / 2);
   update_button();
   connect(ui->close_label, &ClickLabel::clicked, this,
-          &Gomoku::handle_click_close);
+          &Gomo5yu::handle_click_close);
   connect(ui->reset_label, &ClickLabel::clicked, this,
-          &Gomoku::handle_click_reset);
+          &Gomo5yu::handle_click_reset);
   startTimer(16);
 }
 
-Gomoku::~Gomoku() { delete ui; }
+Gomo5yu::~Gomo5yu() { delete ui; }
 
-void Gomoku::wheelEvent(QWheelEvent *event) {
+void Gomo5yu::wheelEvent(QWheelEvent *event) {
   if (event->delta() == 0) {
     return;
   }
@@ -144,7 +144,7 @@ void Gomoku::wheelEvent(QWheelEvent *event) {
   update();
 }
 
-void Gomoku::mouseReleaseEvent(QMouseEvent *event) {
+void Gomo5yu::mouseReleaseEvent(QMouseEvent *event) {
   if (!left_pressed_ && event->button() == Qt::LeftButton) {
     return;
   }
@@ -164,7 +164,7 @@ void Gomoku::mouseReleaseEvent(QMouseEvent *event) {
   }
 }
 
-void Gomoku::mousePressEvent(QMouseEvent *event) {
+void Gomo5yu::mousePressEvent(QMouseEvent *event) {
   Q_UNUSED(event)
   if (event->button() == Qt::LeftButton) {
     cursor_global_pos_when_pressed_ = event->globalPos();
@@ -177,7 +177,7 @@ void Gomoku::mousePressEvent(QMouseEvent *event) {
   }
 }
 
-void Gomoku::mouseMoveEvent(QMouseEvent *event) {
+void Gomo5yu::mouseMoveEvent(QMouseEvent *event) {
   Q_UNUSED(event)
   QPoint cursor_diff = event->globalPos() - cursor_global_pos_when_pressed_;
   if (event->buttons() != Qt::LeftButton ||
@@ -189,7 +189,7 @@ void Gomoku::mouseMoveEvent(QMouseEvent *event) {
   move(pos_when_pressed_ + cursor_diff);
 }
 
-void Gomoku::paintEvent(QPaintEvent *event) {
+void Gomo5yu::paintEvent(QPaintEvent *event) {
   Q_UNUSED(event)
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
@@ -279,13 +279,13 @@ void Gomoku::paintEvent(QPaintEvent *event) {
   painter.drawPixmap(0, 0, noise_pix_);
 }
 
-void Gomoku::leaveEvent(QEvent *event) {
+void Gomo5yu::leaveEvent(QEvent *event) {
   Q_UNUSED(event)
   left_pressed_ = false;
   right_pressed_ = false;
 }
 
-void Gomoku::timerEvent(QTimerEvent *event) {
+void Gomo5yu::timerEvent(QTimerEvent *event) {
   Q_UNUSED(event)
   QPoint cursor_pos = QCursor::pos() - pos();
   QPoint detect_move = move_pos(cursor_pos);
@@ -299,7 +299,7 @@ void Gomoku::timerEvent(QTimerEvent *event) {
   update();
 }
 
-void Gomoku::make_move(const QPointF &mouse_pos) {
+void Gomo5yu::make_move(const QPointF &mouse_pos) {
   QPoint new_move = move_pos(mouse_pos);
   if (move_list_.contains(new_move) || new_move.x() < 0 || new_move.y() < 0) {
     return;
@@ -317,7 +317,7 @@ void Gomoku::make_move(const QPointF &mouse_pos) {
   update();
 }
 
-QPoint Gomoku::move_pos(const QPointF &mouse_pos) const {
+QPoint Gomo5yu::move_pos(const QPointF &mouse_pos) const {
   if (design_.horizontalThreadCount <= 0 || design_.verticalThreadCount <= 0) {
     return QPoint{-1, -1};
   }
@@ -365,25 +365,25 @@ QPoint Gomoku::move_pos(const QPointF &mouse_pos) const {
   return target;
 }
 
-double Gomoku::board_x_begin() const {
+double Gomo5yu::board_x_begin() const {
   return design_.margin + design_.threadWidth / 2;
 }
 
-double Gomoku::board_x_end() const {
+double Gomo5yu::board_x_end() const {
   return design_.boardSizeWithMargin.width() - design_.margin -
          design_.threadWidth / 2;
 }
 
-double Gomoku::board_y_begin() const {
+double Gomo5yu::board_y_begin() const {
   return design_.margin + design_.threadWidth / 2 + get_board_y_offset();
 }
 
-double Gomoku::board_y_end() const {
+double Gomo5yu::board_y_end() const {
   return design_.boardSizeWithMargin.height() - design_.margin -
          design_.threadWidth / 2 + get_board_y_offset();
 }
 
-double Gomoku::board_cell_width() const {
+double Gomo5yu::board_cell_width() const {
   if (design_.horizontalThreadCount == 1) {
     return 0;
   }
@@ -391,18 +391,18 @@ double Gomoku::board_cell_width() const {
          (design_.horizontalThreadCount - 1);
 }
 
-double Gomoku::board_cell_height() const {
+double Gomo5yu::board_cell_height() const {
   if (design_.verticalThreadCount == 1) {
     return 0;
   }
   return (board_y_end() - board_y_begin()) / (design_.verticalThreadCount - 1);
 }
 
-double Gomoku::piece_diameter() const {
+double Gomo5yu::piece_diameter() const {
   return qMin(board_cell_width(), board_cell_height()) * 1.;
 }
 
-QRectF Gomoku::piece_rect(const QPoint &piece_index) const {
+QRectF Gomo5yu::piece_rect(const QPoint &piece_index) const {
   return QRectF{(board_x_begin() + piece_index.x() * board_cell_width()) -
                     piece_diameter() / 2,
                 (board_y_begin() + piece_index.y() * board_cell_height()) -
@@ -410,7 +410,7 @@ QRectF Gomoku::piece_rect(const QPoint &piece_index) const {
                 piece_diameter(), piece_diameter()};
 }
 
-void Gomoku::get_button_pix(const QString &button_text, QPixmap &normal,
+void Gomo5yu::get_button_pix(const QString &button_text, QPixmap &normal,
                             QPixmap &hover, QPixmap &press) {
   QFont font;
   font.setFamily("microsoft yahei");
@@ -459,9 +459,9 @@ void Gomoku::get_button_pix(const QString &button_text, QPixmap &normal,
   press = press_pix;
 }
 
-void Gomoku::handle_click_close() { close(); }
+void Gomo5yu::handle_click_close() { close(); }
 
-void Gomoku::handle_click_reset() {
+void Gomo5yu::handle_click_reset() {
   if (!move_list_.isEmpty()) {
     play_sound(RESET_GAME);
     move_list_.clear();
@@ -473,7 +473,7 @@ void Gomoku::handle_click_reset() {
   }
 }
 
-QSizeF Gomoku::get_size_from_board_size(const QSizeF &board_size) const {
+QSizeF Gomo5yu::get_size_from_board_size(const QSizeF &board_size) const {
   QLayout *layout = this->layout();
   QSizeF size = board_size;
   if (layout) {
@@ -484,13 +484,13 @@ QSizeF Gomoku::get_size_from_board_size(const QSizeF &board_size) const {
   return size;
 }
 
-QPointF Gomoku::get_board_pos_from_window_pos(const QPointF &window_pos) const {
+QPointF Gomo5yu::get_board_pos_from_window_pos(const QPointF &window_pos) const {
   QPointF pos = window_pos;
   pos.setY(pos.y() - get_board_y_offset());
   return pos;
 }
 
-double Gomoku::get_board_y_offset() const {
+double Gomo5yu::get_board_y_offset() const {
   int offset_y = ui->top_widget->height();
 
   if (layout()) {
@@ -499,17 +499,17 @@ double Gomoku::get_board_y_offset() const {
   return static_cast<double>(offset_y);
 }
 
-QRectF Gomoku::board_rect() const {
+QRectF Gomo5yu::board_rect() const {
   QRectF rect{0, get_board_y_offset(), design_.boardSizeWithMargin.width(),
               design_.boardSizeWithMargin.height()};
   return rect;
 }
 
-QRectF Gomoku::bar_rect() const {
+QRectF Gomo5yu::bar_rect() const {
   return QRectF{0, 0, static_cast<double>(width()), board_y_begin()};
 }
 
-int Gomoku::checkFiveInARow(const QList<QPoint> &move_list,
+int Gomo5yu::checkFiveInARow(const QList<QPoint> &move_list,
                             const QList<bool> &role_list) {
   if (move_list.size() < 5 || move_list.size() != role_list.size()) {
     return -1;
@@ -562,7 +562,7 @@ int Gomoku::checkFiveInARow(const QList<QPoint> &move_list,
   return -1;
 }
 
-void Gomoku::update_button() {
+void Gomo5yu::update_button() {
   {
     QPixmap normal, hover, press;
     get_button_pix("＞﹏＜", normal, hover, press);
@@ -579,7 +579,7 @@ void Gomoku::update_button() {
   }
 }
 
-QPixmap Gomoku::get_noise_pix(const QSize &size, int noise_width,
+QPixmap Gomo5yu::get_noise_pix(const QSize &size, int noise_width,
                               int rgba_max) {
   QImage image{size, QImage::Format_ARGB32};
 
@@ -616,12 +616,12 @@ QPixmap Gomoku::get_noise_pix(const QSize &size, int noise_width,
   return QPixmap::fromImage(image);
 }
 
-int Gomoku::random_int(int min, int max) {
+int Gomo5yu::random_int(int min, int max) {
   std::uniform_int_distribution<int> dist(min, max);
   return dist(rng_engine);
 }
 
-QPixmap Gomoku::get_piece_pix(const QSize &size, bool is_sente) {
+QPixmap Gomo5yu::get_piece_pix(const QSize &size, bool is_sente) {
   if (size.width() <= 0 || size.height() <= 0) {
     return QPixmap();
   }
@@ -695,7 +695,7 @@ QPixmap Gomoku::get_piece_pix(const QSize &size, bool is_sente) {
   return pixmap;
 }
 
-QString Gomoku::get_random_emoticon() {
+QString Gomo5yu::get_random_emoticon() {
   if (emoticon_list_.isEmpty()) {
     return "";
   }
@@ -703,7 +703,7 @@ QString Gomoku::get_random_emoticon() {
   return emoticon_list_.at(index);
 }
 
-void Gomoku::init_emoticon_list() {
+void Gomo5yu::init_emoticon_list() {
   emoticon_list_ << "/_ \\"
                  << "（；´д｀）ゞ"
                  << "＞﹏＜"
@@ -721,7 +721,7 @@ void Gomoku::init_emoticon_list() {
                  << "〒▽〒";
 }
 
-void Gomoku::play_sound(SoundType type) {
+void Gomo5yu::play_sound(SoundType type) {
   if (!media_player_) {
     return;
   }
@@ -752,7 +752,7 @@ void Gomoku::play_sound(SoundType type) {
   media_player_->play();
 }
 
-void Gomoku::handle_playback_error(QMediaPlayer::Error error) {
+void Gomo5yu::handle_playback_error(QMediaPlayer::Error error) {
   qDebug() << error;
   if (media_player_) {
     media_player_->stop();
